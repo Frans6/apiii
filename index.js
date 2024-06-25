@@ -7,6 +7,7 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 
+
 // Middleware para fazer o parse do corpo das requisições
 app.use(bodyParser.json());
 app.use(cors()); // Habilita CORS para todas as rotas
