@@ -20,31 +20,6 @@ app.get('/api', (req, res) => {
     res.send('Hello, world! This is my API.');
 });
 
-// Fila de mensagens
-const messageQueue = [];
-
-// Função para enviar mensagem para um chatId específico
-const sendMessage = (chatId, message) => {
-    axios.get(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
-        .then(response => {
-            console.log(`Mensagem enviada para ${chatId}:`, response.data);
-        })
-        .catch(error => {
-            console.error(`Erro ao enviar mensagem para ${chatId}:`, error);
-        });
-};
-
-// Função para processar a fila de mensagens
-const processMessageQueue = () => {
-    while (messageQueue.length > 0) {
-        const { chatId, message } = messageQueue.shift();
-        sendMessage(chatId, message);
-    }
-};
-
-// Agendar o processamento da fila de mensagens a cada 5 segundos
-setInterval(processMessageQueue, 5000);
-
 // Rota para receber os dados e salvar no arquivo de texto
 app.post('/api/save-to-txt', (req, res) => {
     const { name } = req.body;
@@ -70,10 +45,23 @@ app.post('/api/save-to-txt', (req, res) => {
     // IDs dos usuários do Telegram
     const chatIds = ['6980166412', '1313432061', '1229458971'];
 
-    // Adicionar mensagens à fila
-    chatIds.forEach((chatId) => {
-        const message = `Nome confirmado: ${name}\n\nLista de nomes:\n${nomesFormatted}`;
-        messageQueue.push({ chatId, message });
+    // Função para enviar mensagem para um chatId específico
+    const sendMessage = (chatId, message) => {
+        axios.get(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+            .then(response => {
+                console.log(`Mensagem enviada para ${chatId}:`, response.data);
+            })
+            .catch(error => {
+                console.error(`Erro ao enviar mensagem para ${chatId}:`, error);
+            });
+    };
+
+    // Agendar o envio de mensagens para cada chatId
+    chatIds.forEach((chatId, index) => {
+        setTimeout(() => {
+            const message = `Nome confirmado: ${name}\n\nLista de nomes:\n${nomesFormatted}`;
+            sendMessage(chatId, message);
+        }, index * 1000); // Enviar a cada 1 segundo (1000 ms)
     });
 
     res.send({ message: 'Nome confirmado com sucesso!' });
