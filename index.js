@@ -1,13 +1,14 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+import fs from 'fs'
+import axios from 'axios';
+import bodyParser from 'body-parser';
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-const fs = require('fs');
-const bodyParser = require('body-parser');
-const axios = require('axios');
+import  { PrismaClient } from '@prisma/client'
 
-
+const prisma = new PrismaClient()
 // Middleware para fazer o parse do corpo das requisições
 app.use(bodyParser.json());
 app.use(cors()); // Habilita CORS para todas as rotas
@@ -22,23 +23,17 @@ app.get('/api', (req, res) => {
 });
 
 // Rota para receber os dados e salvar no arquivo de texto
-app.post('/api/save-to-txt', (req, res) => {
+app.post('/api/save-to-txt', async (req, res) => {
     const { name } = req.body;
-
-    // Caminho do arquivo de texto
-    const filePath = 'nomes.txt';
-
-    // Adiciona o nome recebido ao arquivo de texto
-    fs.appendFileSync(filePath, name + '\n');
-
-    // Ler o conteúdo do arquivo de texto
-    const nomes = fs.readFileSync(filePath, 'utf8').trim();
-
-    // Transforma a lista de nomes em um array
-    const nomesArray = nomes.split('\n');
+    await prisma.pessoa.create({
+        data: {
+            nome: name
+        }
+    })
+    const nomesArray = await prisma.pessoa.findMany();
 
     // Formata a lista de nomes para a mensagem
-    const nomesFormatted = nomesArray.map((nome, index) => `${index + 1}. ${nome}`).join('\n');
+    const nomesFormatted = nomesArray.map((pessoa, index) => `${index + 1}. ${pessoa.nome}`).join('\n');
 
     // Enviar mensagem para o Telegram com a lista de nomes
     const token = '6773581735:AAEm-wAQAcM783Gef1vL41mdonM2N-DnyoM';
@@ -78,9 +73,28 @@ app.get('/api/guests-list', async (req, res) => {
     }
 });
 
+app.delete('/api/delete', async (req, res) => {
+    try {
+        const {name} = req.body
+        await prisma.pessoa.delete({
+            where: {
+                nome: name
+            }
+        })
+        res.send({message: "deu certo"})
+
+    } catch (error) {
+        console.log(error);
+        // res.sendStatus(500)
+        res.send({message: "Nome não encontrado"})
+    }
+    
+})
+
 app.get('/api/confirmados', async (req, res) => {
     try {
-        const data = await fs.promises.readFile('./nomes.txt', { encoding: 'utf8' });
+        // const data = await fs.promises.readFile('./nomes.txt', { encoding: 'utf8' });
+        const data = await prisma.pessoa.findMany();
         res.send(data);
       } catch (error) {
         console.error('Erro ao ler arquivo:', error);

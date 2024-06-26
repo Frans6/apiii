@@ -5,6 +5,7 @@
   "engines": {
     "node": "20.x"
   },
+  "type": "module",
   "scripts": {
     "start": "node index.js"
   },
@@ -13,10 +14,17 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "^5.14.0",
     "axios": "^1.7.2",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "nodemailer": "^6.9.14"
+  },
+  "devDependencies": {
+   
+    "prisma": "^5.14.0",
+    "prisma-erd-generator": "^1.2.5"
+   
   }
 }
