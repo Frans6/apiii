@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = "postgresql://nome_user:RpqucCRzxo4O97VkUAh9mmfiPCsjLV3W@dpg-cpu0empu0jms73eh2n00-a/nome"
 }
 
 model pessoa {
