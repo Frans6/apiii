@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://nome_user:RpqucCRzxo4O97VkUAh9mmfiPCsjLV3W@dpg-cpu0empu0jms73eh2n00-a/nome"
+  url      = "postgresql://banco_7xx3_user:HIgoA5WQWXiaHAV9fxLkS2TmPKSXaERA@dpg-cqvjagbtq21c7382u0e0-a/banco_7xx3"
 }
 
 model pessoa {
